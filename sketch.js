@@ -1,14 +1,22 @@
-var Ron,bulldozer1,enmy1,bullet,wallG,bulldozerImg,enemyImg;
-var mazeWall1;
+var Ron,mazeWall1,bulldozer1,enmy1,bullet,bulletGroup,wallG,score1,score2,score3,scoreCount = 0,door;
+var enemyImg,bushImg,mazeBack,bulletImg,bulldozerImg,keyImg;
+var runAnimation,explodeAnimation;
 
 function preload(){
   bulldozerImg = loadImage("sprites/bulldozer.png");
   enemyImg = loadImage("sprites/enemy.png");
-
+  bushImg = loadImage("sprites/bush.png");
+  bulletImg = loadImage("sprites/bullet.png");
+  keyImg = loadImage("sprites/key.png");
+  //runAnimation = loadAnimation("sprites/run1","sprites/run2","sprites/run3","sprites/run4","sprites/run5","sprites/run6","sprites/run7","sprites/run8","sprites/run9","sprites/run10","sprites/run11","sprites/run12");
+  explodeAnimation = loadImage("sprites/boom.gif");
 }
 
 function setup() {
   createCanvas(displayWidth,550);
+  
+  mazeBack = createSprite(865,270,50,50);
+  mazeBack.addImage(bushImg);
   wallG = createGroup();
   topWall = createSprite(750,-5,2999,10)
   topWall.visible = false;
@@ -86,6 +94,11 @@ function setup() {
   wallG.add(mazeWall29);
   mazeWall28 = createSprite(880,407,10,50);
   wallG.add(mazeWall28);
+  mazeWall29 = createSprite(860,5,520,10);
+  wallG.add(mazeWall29);
+  mazeWall29 = createSprite(860,545,520,10);
+  wallG.add(mazeWall29);
+  wallG.setColorEach("rgb(130,90,71)")
 
   // The playing character(PC)
   Ron = createSprite(25, 200, 20, 30);
@@ -124,12 +137,35 @@ function setup() {
   enmy4.addImage(enemyImg);
   enmy4.scale = 0.3;
 
-  
+  bulletGroup = new Group();
+
+  // door
+  door = createSprite(1125,285,10,50);
+  door.shapeColor = "rgb(92,25,22)"
+
+  // keys
+  score1 = createSprite(925,405,10,10);
+  score1.addImage(keyImg);
+  score1.setCollider("rectangle",-20,0,20,40);
+  score1.debug = true;
+
+  score2 = createSprite(895,85,10,10);
+  score2.addImage(keyImg);
+  score2.setCollider("rectangle",-20,0,20,40);
+  score2.debug = true;
+
+  score3 = createSprite(1115,75,10,10);
+  score3.addImage(keyImg);
+  score3.setCollider("rectangle",-20,0,20,40);
+  score3.debug = true;
+
 }
 
 function draw() {
-  background(0);
+  background(10);
   Ron.collide(wallG);
+  Ron.collide(door);
+
   if(keyDown(UP_ARROW) || keyDown("w")){
     Ron.y -= 10;
   };
@@ -142,7 +178,68 @@ function draw() {
   if(keyDown(LEFT_ARROW) || keyDown("a")){
     Ron.x -= 10;
   };
-  shootBullet();
+
+  if (Ron.isTouching(score1)){
+    score1.destroy();
+    scoreCount +=  1;
+  };
+  if (Ron.isTouching(score2)){
+    score2.destroy();
+    scoreCount +=  1;
+  };
+  if (Ron.isTouching(score3)){
+    score3.destroy();
+    scoreCount +=  1;
+  }
+  
+  if(scoreCount === 3){
+    door.destroy();
+  }
+
+  // creating bullets
+  
+if(bulletGroup.isTouching(bulldozer1)){
+  bulldozer1.destroy();
+  imageMode(CENTER);
+  image(explodeAnimation,bulldozer1.x,bulldozer1.y);
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(bulldozer2)){
+  bulldozer2.destroy();
+  imageMode(CENTER);
+  image(explodeAnimation,bulldozer2.x,bulldozer2.y);
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(bulldozer3)){
+  bulldozer3.destroy();
+  imageMode(CENTER);
+  image(explodeAnimation,bulldozer3.x,bulldozer3.y);
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(bulldozer4)){
+  bulldozer4.destroy();
+  imageMode(CENTER);
+  image(explodeAnimation,bulldozer4.x,bulldozer4.y);
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(enmy1)){
+  enmy1.destroy();
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(enmy2)){
+  enmy2.destroy();
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(enmy3)){
+  enmy3.destroy();
+  bulletGroup.destroyEach();
+}
+if(bulletGroup.isTouching(enmy4)){
+  enmy4.destroy();
+  bulletGroup.destroyEach();
+}
+
+  shootBullets(); 
 
   console.log(Ron.x,Ron.y);
   drawSprites();
@@ -150,18 +247,15 @@ function draw() {
   camera.position.y = Ron.y;
 }
 
-function shootBullet(){
-  if(keyDown("space") ){
-    bullet = createSprite(Ron.x,Ron.y,10,5);
-    bullet.velocityX = 5;
-
-    bullet.lifetime = 100;
-    if(bullet.isTouching(bulldozer1)){
-      bulldozer1.destroy();
-      bullet.destroy();
-    }
-    console.log(bullet.x);
+function shootBullets(){
+  if(keyDown("space") && frameCount % 2 === 0){
+   bullet=createSprite(10,10,20,10);
+   bullet.addImage(bulletImg);
+   bullet.setCollider("rectangle",0,-10,15,10);
+   bullet.x=Ron.x;
+   bullet.y=Ron.y;
+   bullet.velocityX=5;
+   bullet.lifetime = 75;
+   bulletGroup.add(bullet);
   }
-
 }
-
