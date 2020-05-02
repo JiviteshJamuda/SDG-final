@@ -1,6 +1,8 @@
-var Ron,mazeWall1,bulldozer1,enmy1,bullet,bulletGroup,wallG,score1,score2,score3,scoreCount = 0,door;
+var Ron,mazeWall1,bulldozer1,enmy1,bullet,bulletGroup,wallG;
+var score1,score2,score3,scoreCount = 0,door;
 var enemyImg,bushImg,mazeBack,bulletImg,bulldozerImg,keyImg;
 var runAnimation,explodeAnimation,standImg;
+var enemyCount = 8;
 
 function preload(){
   bulldozerImg = loadImage("sprites/bulldozer.png");
@@ -103,7 +105,8 @@ function setup() {
 
   // The playing character(PC)
   Ron = createSprite(25, 200, 20, 30);
-  Ron.scale=0.5;
+  Ron.scale=0.25;
+  Ron.setCollider("rectangle",-35,0,100,150);
 
   // First set of bulldozer
   bulldozer1 =createSprite(370, 70, 100, 50);
@@ -125,19 +128,19 @@ function setup() {
   // First set of enemies
   enmy1 = createSprite(250,70,20,30);
   enmy1.addImage(enemyImg);
-  enmy1.scale = 0.3;
+  enmy1.scale = 0.2;
 
   enmy2 = createSprite(250,190,20,30);
   enmy2.addImage(enemyImg);
-  enmy2.scale = 0.3;
+  enmy2.scale = 0.2;
 
   enmy3 = createSprite(250,310,20,30);
   enmy3.addImage(enemyImg);
-  enmy3.scale = 0.3;
+  enmy3.scale = 0.2;
 
   enmy4 = createSprite(250,430,20,30);
   enmy4.addImage(enemyImg);
-  enmy4.scale = 0.3;
+  enmy4.scale = 0.2;
 
   bulletGroup = new Group();
 
@@ -148,15 +151,15 @@ function setup() {
   // keys
   score1 = createSprite(925,405,10,10);
   score1.addImage(keyImg);
-  score1.setCollider("rectangle",-20,0,20,40);
+  score1.setCollider("rectangle",-20,0,20,30);
 
   score2 = createSprite(895,85,10,10);
   score2.addImage(keyImg);
-  score2.setCollider("rectangle",-20,0,20,40);
+  score2.setCollider("rectangle",-20,0,20,30);
 
   score3 = createSprite(1115,75,10,10);
   score3.addImage(keyImg);
-  score3.setCollider("rectangle",-20,0,20,40);
+  score3.setCollider("rectangle",-20,0,20,30);
 
 }
 
@@ -167,28 +170,28 @@ function draw() {
 
   if(keyIsDown(UP_ARROW) || keyDown("w")){
     Ron.y -= 10;
-    Ron.addAnimation(runAnimation);
+    Ron.addAnimation("running",runAnimation);
   }else{
     Ron.addImage(standImg);
   };
 
   if(keyIsDown(DOWN_ARROW) || keyDown("s")){
     Ron.y += 10;
-    Ron.addAnimation(runAnimation);
+    Ron.addAnimation("running",runAnimation);
   }else{
     Ron.addImage(standImg);
   };
 
-  if(keyIsDown(RIGHT_ARROW) || keyDown("d")){
+  if(keyIsDown(RIGHT_ARROW) || keyDown("d") && enemyCount === 0){
     Ron.x += 10;
-    Ron.addAnimation(runAnimation);
+    Ron.addAnimation("running",runAnimation);
   }else{
     Ron.addImage(standImg);
   };
 
-  if(keyIsDown(LEFT_ARROW) || keyDown("a")){
+  if(keyIsDown(LEFT_ARROW) || keyDown("a") && enemyCount === 0){
     Ron.x -= 10;
-    Ron.addAnimation(runAnimation);
+    Ron.addAnimation("running",runAnimation);
   }else{
     Ron.addImage(standImg);
   };
@@ -217,40 +220,48 @@ if(bulletGroup.isTouching(bulldozer1)){
   imageMode(CENTER);
   image(explodeAnimation,bulldozer1.x,bulldozer1.y);
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(bulldozer2)){
   bulldozer2.destroy();
   imageMode(CENTER);
   image(explodeAnimation,bulldozer2.x,bulldozer2.y);
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(bulldozer3)){
   bulldozer3.destroy();
   imageMode(CENTER);
   image(explodeAnimation,bulldozer3.x,bulldozer3.y);
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(bulldozer4)){
   bulldozer4.destroy();
   imageMode(CENTER);
   image(explodeAnimation,bulldozer4.x,bulldozer4.y);
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(enmy1)){
   enmy1.destroy();
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(enmy2)){
   enmy2.destroy();
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(enmy3)){
   enmy3.destroy();
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 if(bulletGroup.isTouching(enmy4)){
   enmy4.destroy();
   bulletGroup.destroyEach();
+  enemyCount -= 1;
 }
 
   shootBullets(); 
@@ -262,12 +273,12 @@ if(bulletGroup.isTouching(enmy4)){
 }
 
 function shootBullets(){
-  if(keyDown("space") && frameCount % 2 === 0){
+  if(keyDown("space") && frameCount % 2 === 0 && enemyCount != 0){
    bullet=createSprite(10,10,20,10);
    bullet.addImage(bulletImg);
    bullet.setCollider("rectangle",0,-10,15,10);
    bullet.x=Ron.x+20;
-   bullet.y=Ron.y-8;
+   bullet.y=Ron.y+2;
    bullet.velocityX=5;
    bullet.lifetime = 75;
    bulletGroup.add(bullet);
